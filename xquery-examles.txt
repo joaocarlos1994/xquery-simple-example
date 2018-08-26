@@ -1,0 +1,250 @@
+Examples by: https://www.youtube.com/watch?v=Hqns5uaJv5g
+
+<fichario>
+    <individuo nome="Asdrubal da Silva">
+        <idade>15</idade>
+        <genero>masculino</genero>
+    </individuo>
+    <individuo nome="Quincas Borba">
+        <idade>33</idade>
+        <genero>masculino</genero>
+    </individuo>
+    <individuo nome="Doriana Margarina">
+        <idade>42</idade>
+        <genero>feminino</genero>
+    </individuo>
+</fichario>
+
+XPath example:
+
+Only age for user Quincas:
+//individuo[@nome="Quincas Borba"]/idade
+<idade>33</idade>
+
+Only age text for user Quincas:
+//individuo[@nome="Quincas Borba"]/idade/text()
+33
+
+Name of user that age is above 20:
+//individuo[idade>20]/@nome
+
+XQuery Example:
+
+How to declare variables in XQuery ('message'):
+
+xquery version "1.0";
+let $message := 'Dinotopia'
+return
+<livro>Título: {$message}</livro>
+
+There is another way to do this:
+
+xquery version "1.0";
+let $message := 'Dinotopia'
+return
+<livro>Título: {data('Título:'),$message}</livro>
+
+How to use another way to execute XQuery:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+return $fichariodoc/fichario/individuo
+
+<?xml version="1.0" encoding="UTF-8"?>
+<individuo nome="Asdrubal da Silva">
+	<idade>15</idade> 
+	<genero>masculino</genero> 
+</individuo>
+<individuo nome="Quincas Borba">
+	<idade>33</idade> 
+	<genero>masculino</genero> 
+</individuo>
+<individuo nome="Doriana Margarina">
+	<idade>42</idade> 
+	<genero>feminino</genero> 
+</individuo>
+
+Only age:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+return $fichariodoc/fichario/individuo/idade
+<?xml version="1.0" encoding="UTF-8"?>
+<idade>15</idade>
+<idade>33</idade>
+<idade>42</idade>
+
+Only male and age > 20:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+return $fichariodoc//fichario/individuo[idade>20][genero='masculino']
+
+<?xml version="1.0" encoding="UTF-8"?>
+<individuo nome="Quincas Borba">
+	<idade>33</idade> 
+	<genero>masculino</genero> 
+</individuo>
+
+How to use count for specific element in xml:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+return count($fichariodoc//individuo)
+
+<?xml version="1.0" encoding="UTF-8"?>
+3
+
+How to count only male user that age is above 20:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+return count($fichariodoc//individuo[idade>20][genero="masculino"])
+
+<?xml version="1.0" encoding="UTF-8"?>
+1
+
+Using for in XQuery:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+for $i in ($fichariodoc//individuo)
+return $i/idade
+
+<?xml version="1.0" encoding="UTF-8"?>
+<idade>15</idade>
+<idade>33</idade>
+<idade>42</idade>
+
+Using expression in for in XQuery:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+for $i in ($fichariodoc//individuo)
+where $i[idade>17]
+return $i/idade
+
+<?xml version="1.0" encoding="UTF-8"?>
+<idade>33</idade>
+<idade>42</idade>
+
+
+Using expression in for and return all node that selected:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+for $i in ($fichariodoc//individuo)
+where $i[idade>17]
+return $i
+
+<?xml version="1.0" encoding="UTF-8"?>
+<individuo nome="Quincas Borba">
+	<idade>33</idade> 
+	<genero>masculino</genero> 
+</individuo>
+<individuo nome="Doriana Margarina">
+	<idade>42</idade> 
+	<genero>feminino</genero> 
+</individuo>
+
+How create a node element using XQuery:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+for $i in ($fichariodoc//individuo)
+where $i[idade>17]
+return <maior>{data($i/@nome)}</maior> 
+
+<?xml version="1.0" encoding="UTF-8"?>
+<maior>Quincas Borba</maior>
+<maior>Doriana Margarina</maior>
+
+
+Using where in for example:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+for $i in ($fichariodoc//individuo)
+where $i[genero='masculino']
+return <masculino>{data($i/@nome)}</masculino>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<masculino>Asdrubal da Silva</masculino>
+<masculino>Quincas Borba</masculino>
+
+Example that using two XQuery:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+return
+<classificacao>
+{
+ for $i in ($fichariodoc//individuo)
+ where $i[idade>17]
+ return <maior>{data($i/@nome)}</maior>
+}
+</classificacao>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<classificacao>
+	<maior>Quincas Borba</maior>
+	<maior>Doriana Margarina</maior>
+</classificacao>
+
+How to use order by in XQuery:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+for $i in ($fichariodoc//individuo)
+where $i[idade>17]
+order by $i/@nome
+return <maior>{data($i/@nome)}</maior>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<maior>Doriana Margarina</maior>
+<maior>Quincas Borba</maior>
+
+How to use if in XQuery example:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+for $i in ($fichariodoc//individuo)
+return if ($i[idade>=18])
+ then <maior>{data($i/@nome)}</maior>
+ else <menor>{data($i/@nome)}</menor>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<menor>Asdrubal da Silva</menor>
+<maior>Quincas Borba</maior>
+<maior>Doriana Margarina</maior>
+
+Another example using if in XQuery:
+xquery version "1.0";
+let $fichariodoc := doc('http://www.ic.unicamp.br/~santanch/teaching/db/xml/fichario.xml')
+for $i in ($fichariodoc//individuo)
+return if ($i[genero="masculino"])
+ then <masculino>{data($i/@nome)}</masculino>
+ else <feminino>{data($i/@nome)}</feminino>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<masculino>Asdrubal da Silva</masculino>
+<masculino>Quincas Borba</masculino>
+<feminino>Doriana Margarina</feminino>
+
+
+Examples by https://www.w3schools.com/xml/xquery_functions.asp
+
+If you cannot find the XQuery function you need, you can write your own:
+
+
+declare function prefix:function_name($parameter as datatype)
+as returnDatatype
+{
+ ...function code here...
+};
+
+Notes on user-defined functions:
+	- Use the declare function keyword
+	- The name of the function must be prefixed
+	- The data type of the parameters are mostly the same as the data type defined in XML Schema
+	- The body of the function must be surrounded by curly braces
+
+
+Example of function:
+
+declare function local:minPrice($p as xs:decimal?, $d as xs:decimal?)
+as xs:decimal?
+{
+let $disc := ($p * $d) div 100
+return ($p - $disc)
+};
+
+Below is an example of how to call the function above:
+<minPrice>{local:minPrice($book/price, $book/discount)}</minPrice>
